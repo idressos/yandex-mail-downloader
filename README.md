@@ -1,4 +1,4 @@
-# Yandex.Mail Downloader
+# :envelope_with_arrow: Yandex.Mail Downloader
 
 This is a Python script that can download all the mailboxes and their contents from a Yandex.Mail account.  
 It supports nested mailboxes, saves emails to EML and Mbox format, and includes email attachments. The script only requires Python3 to run.
