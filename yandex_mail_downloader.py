@@ -3,6 +3,7 @@ import email
 import imaplib
 import argparse
 from mailbox import mbox
+from datetime import datetime, timedelta
 
 # Function for converting downloaded mailboxes from EML to Mbox format
 def convert_to_mbox(mailbox_folder):
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('username', type=str, help='Yandex email account username')
     parser.add_argument('password', type=str, help='Yandex email account password')
     parser.add_argument('--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
+    parser.add_argument('--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
     args = parser.parse_args()
 
     # Connect to the Yandex IMAP server over SSL
@@ -76,7 +78,12 @@ if __name__ == '__main__':
         # Select mailbox
         try:
             connection.select(mailbox_name)
-            typ, data = connection.search(None, 'ALL')
+
+            if(args.max_age > 0):
+                cutoff_date = (datetime.today() - timedelta(days=args.max_age)).strftime('%d-%b-%Y')
+                typ, data = connection.search(None, f'SINCE {cutoff_date}')
+            else:
+                typ, data = connection.search(None, 'ALL')
         except Exception as e:
             print(f'Error: Failed to select mailbox {mailbox_name_canonical}')
             print(str(e))

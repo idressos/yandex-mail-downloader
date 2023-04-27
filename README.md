@@ -14,5 +14,5 @@ python3 yandex-mail-downloader.py [username] [password]
 ```
 
 The script will start downloading all the mailboxes and their contents from your account.  
-You can also choose to save the emails in Mbox format by supplying the `--mbox` flag.  
+You can also choose to save the emails in Mbox format by supplying the `--mbox` flag, or only download emails newer than X days by using the --max-age parameter.
 The script will automatically create a folder for each mailbox and save the emails inside it.
