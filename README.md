@@ -12,7 +12,7 @@ To run the script, open your terminal and navigate to the directory where the sc
 Then run the following command, replacing `[username]` and `[password]` with your Yandex.Mail account username and app password for IMAP, respectively:
 
 ```
-python3 yandex-mail-downloader.py [username] [password]
+python3 yandex_mail_downloader.py [username] [password]
 ```
 
 The script will start downloading all the mailboxes and their contents from your account.  
