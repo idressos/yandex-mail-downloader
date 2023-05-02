@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         # Select mailbox
         try:
-            connection.select(mailbox_name)
+            connection.select('"' + mailbox_name + '"' if (' ' in mailbox_name or not mailbox_name.isascii()) else mailbox_name)
 
             if(args.max_age > 0):
                 cutoff_date = (datetime.today() - timedelta(days=args.max_age)).strftime('%d-%b-%Y')
