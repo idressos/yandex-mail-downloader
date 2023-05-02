@@ -95,9 +95,19 @@ if __name__ == '__main__':
 
         # Download mailbox contents
         print(f'Downloading contents of mailbox {mailbox_name_canonical}..')
-        for email_id in data[0].split():
+        for message_number in data[0].split():
             try:
-                typ, data = connection.fetch(email_id, '(RFC822)')
+                # Fetch the email UID from the server
+                typ, data = connection.fetch(message_number, '(UID)')
+                email_uid = data[0].split()[-1].decode()
+
+                email_file_name = f'{email_uid}.eml'
+
+                # Check if the email has already been downloaded
+                if email_file_name in os.listdir(mailbox_folder_path):
+                    continue
+
+                typ, data = connection.fetch(message_number, '(RFC822)')
                 email_content = data[0][1]
 
                 # Parse the email message
@@ -105,10 +115,10 @@ if __name__ == '__main__':
 
                 # Save the email message in EML format
                 encoding = msg.get_content_charset() or 'utf-8'
-                with open(os.path.join(mailbox_folder_path, f'{email_id.decode()}.eml'), 'wb') as f:
+                with open(os.path.join(mailbox_folder_path, email_file_name), 'wb') as f:
                     f.write(email_content)
             except Exception as e:
-                print(f'Error: Failed to download email {email_id.decode()} from mailbox {mailbox_name_canonical}')
+                print(f'Error: Failed to download email {email_uid} from mailbox {mailbox_name_canonical}')
                 print(str(e))
                 continue
 
