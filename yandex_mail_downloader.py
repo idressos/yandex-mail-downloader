@@ -25,8 +25,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download all mailboxes and their contents from a Yandex email account')
     parser.add_argument('username', type=str, help='Yandex email account username')
     parser.add_argument('password', type=str, help='Yandex email account password')
-    parser.add_argument('--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
-    parser.add_argument('--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
+    parser.add_argument('-c', '--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
+    parser.add_argument('-d', '--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
     parser.add_argument('-e', '--exclude', type=str, nargs='*', help='List of mailboxes to exclude')
     args = parser.parse_args()
 
