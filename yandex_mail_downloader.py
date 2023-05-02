@@ -65,7 +65,7 @@ if __name__ == '__main__':
         mailbox_name = mailbox.decode('utf-8').split(' "|" ')[-1].replace('"', '').replace('/', '_')
         mailbox_name_canonical = mailbox_name.replace('|', '/')
 
-        if mailbox_name_canonical in args.exclude:
+        if args.exclude is not None and mailbox_name_canonical in args.exclude:
             continue
 
         # Mailbox server path
