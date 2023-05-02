@@ -27,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('password', type=str, help='Yandex email account password')
     parser.add_argument('--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
     parser.add_argument('--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
+    parser.add_argument('-e', '--exclude', type=str, nargs='*', help='List of mailboxes to exclude')
     args = parser.parse_args()
 
     # Connect to the Yandex IMAP server over SSL
@@ -63,6 +64,9 @@ if __name__ == '__main__':
         # Mailbox name
         mailbox_name = mailbox.decode('utf-8').split(' "|" ')[-1].replace('"', '').replace('/', '_')
         mailbox_name_canonical = mailbox_name.replace('|', '/')
+
+        if mailbox_name_canonical in args.exclude:
+            continue
 
         # Mailbox server path
         mailbox_path = mailbox_name.split('|')
