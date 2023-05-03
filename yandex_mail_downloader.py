@@ -28,7 +28,9 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
     parser.add_argument('-s', '--sync', action='store_true', help='Delete local email files that are not on the server')
     parser.add_argument('-a', '--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
-    parser.add_argument('-e', '--exclude', type=str, nargs='*', help='List mailboxes to exclude')
+    parser.add_argument('-e', '--exclude', type=str, nargs='+', help='List mailboxes to exclude from downloading')
+    parser.add_argument('-i', '--include', type=str, nargs='+', help='List mailboxes to include (only those specified will be downloaded)')
+
     args = parser.parse_args()
 
     # Connect to the Yandex IMAP server over SSL
@@ -66,6 +68,8 @@ if __name__ == '__main__':
         mailbox_name = mailbox.decode('utf-8').split(' "|" ')[-1].replace('"', '').replace('/', '_')
         mailbox_name_canonical = mailbox_name.replace('|', '/')
 
+        if args.include is not None and mailbox_name_canonical not in args.include:
+            continue
         if args.exclude is not None and mailbox_name_canonical in args.exclude:
             continue
 
