@@ -46,7 +46,7 @@ if __name__ == '__main__':
         exit()
 
     # Get the list of mailboxes
-    print('Listing account mailboxes..')
+    print('Listing account mailboxes..\n')
     try:
         connection.select()
         typ, data = connection.list()
@@ -93,17 +93,28 @@ if __name__ == '__main__':
             print(str(e))
             continue
 
+        # Initialize counters
+        saved = 0
+        skipped = 0
+        failed = 0
+        total = 0
+
         # Download mailbox contents
         print(f'Downloading contents of mailbox {mailbox_name_canonical}..')
         for email_uid in data[0].split():
+            total += 1
+
             try:
                 # Decode email UID
                 email_uid = email_uid.decode()
 
                 email_file_name = f'{email_uid}.eml'
+                email_file_path = os.path.join(mailbox_folder_path, email_file_name)
+                email_file_size = os.stat(email_file_path).st_size if os.path.isfile(email_file_path) else -1
 
                 # Check if the email has already been downloaded
-                if email_file_name in os.listdir(mailbox_folder_path):
+                if email_file_name in os.listdir(mailbox_folder_path) and email_file_size > 0:
+                    skipped += 1
                     continue
 
                 typ, data = connection.uid('FETCH', email_uid, '(RFC822)')
@@ -114,15 +125,23 @@ if __name__ == '__main__':
 
                 # Save the email message in EML format
                 encoding = msg.get_content_charset() or 'utf-8'
-                with open(os.path.join(mailbox_folder_path, email_file_name), 'wb') as f:
+                with open(email_file_path, 'wb') as f:
                     f.write(email_content)
+                    saved += 1
             except Exception as e:
                 print(f'Error: Failed to download email with UID {email_uid} from mailbox {mailbox_name_canonical}')
                 print(str(e))
+                failed += 1
                 continue
 
+        print(f'  Saved: {saved}\n  Skipped: {skipped}\n  Failed: {failed}\n  Total: {total}')
+
+        # Convert to MBOX format if specified
         if args.mbox:
+            print('Generating MBOX file..\n')
             convert_to_mbox(mailbox_folder_path)
+        else:
+            print('')
 
     # Close the connection to the Yandex email account
     print('Closing the connection..')
