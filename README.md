@@ -19,8 +19,11 @@ The script will start downloading all the mailboxes and their contents from your
 You can also choose to:
 * Save the emails in Mbox format by supplying the `--mbox` flag
 * Only download emails newer than X days by using the `--max-age` parameter
+  * e.g. `--max-age 14`
 * Skip downloading certain mailboxes with the `--exclude` parameter
-* Download only specific mailboxes with the `--include` parameter
-* Remove local EML files of emails that are not on the server anymore (`--sync` parameter)
+  * e.g. `--exclude Trash`, `--exclude Junk Archive`
+* Only download specific mailboxes with the `--include` parameter
+  * e.g. `--include INBOX`, `--include Drafts Drafts/template`
+* Remove local EML files of emails that have been deleted from the server (`--sync` flag)
 
 The script will automatically create a folder for each mailbox and save the emails inside it.
