@@ -85,9 +85,9 @@ if __name__ == '__main__':
 
             if(args.max_age > 0):
                 cutoff_date = (datetime.today() - timedelta(days=args.max_age)).strftime('%d-%b-%Y')
-                typ, data = connection.search(None, f'SINCE {cutoff_date}')
+                typ, data = connection.uid('SEARCH', None, f'SINCE {cutoff_date}')
             else:
-                typ, data = connection.search(None, 'ALL')
+                typ, data = connection.uid('SEARCH', None, 'ALL')
         except Exception as e:
             print(f'Error: Failed to select mailbox {mailbox_name_canonical}')
             print(str(e))
@@ -95,11 +95,10 @@ if __name__ == '__main__':
 
         # Download mailbox contents
         print(f'Downloading contents of mailbox {mailbox_name_canonical}..')
-        for message_number in data[0].split():
+        for email_uid in data[0].split():
             try:
-                # Fetch the email UID from the server
-                typ, data = connection.fetch(message_number, '(UID)')
-                email_uid = data[0].split()[-1].decode()
+                # Decode email UID
+                email_uid = email_uid.decode()
 
                 email_file_name = f'{email_uid}.eml'
 
@@ -107,7 +106,7 @@ if __name__ == '__main__':
                 if email_file_name in os.listdir(mailbox_folder_path):
                     continue
 
-                typ, data = connection.fetch(message_number, '(RFC822)')
+                typ, data = connection.uid('FETCH', email_uid, '(RFC822)')
                 email_content = data[0][1]
 
                 # Parse the email message
@@ -118,7 +117,7 @@ if __name__ == '__main__':
                 with open(os.path.join(mailbox_folder_path, email_file_name), 'wb') as f:
                     f.write(email_content)
             except Exception as e:
-                print(f'Error: Failed to download email {email_uid} from mailbox {mailbox_name_canonical}')
+                print(f'Error: Failed to download email with UID {email_uid} from mailbox {mailbox_name_canonical}')
                 print(str(e))
                 continue
 
