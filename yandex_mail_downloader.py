@@ -25,9 +25,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download all mailboxes and their contents from a Yandex email account')
     parser.add_argument('username', type=str, help='Yandex email account username')
     parser.add_argument('password', type=str, help='Yandex email account password')
-    parser.add_argument('-c', '--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
-    parser.add_argument('-d', '--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
-    parser.add_argument('-e', '--exclude', type=str, nargs='*', help='List of mailboxes to exclude')
+    parser.add_argument('-m', '--mbox', action='store_true', help='Convert downloaded mailboxes to Mbox format')
+    parser.add_argument('-s', '--sync', action='store_true', help='Delete local email files that are not on the server')
+    parser.add_argument('-a', '--max-age', type=int, default=-1, help='Only download emails newer than (since) X days')
+    parser.add_argument('-e', '--exclude', type=str, nargs='*', help='List mailboxes to exclude')
     args = parser.parse_args()
 
     # Connect to the Yandex IMAP server over SSL
@@ -97,11 +98,15 @@ if __name__ == '__main__':
         saved = 0
         skipped = 0
         failed = 0
+        removed = 0
         total = 0
 
         # Download mailbox contents
         print(f'Downloading contents of mailbox {mailbox_name_canonical}..')
-        for email_uid in data[0].split():
+
+        email_uids = data[0].split()
+
+        for email_uid in email_uids:
             total += 1
 
             try:
@@ -134,11 +139,20 @@ if __name__ == '__main__':
                 failed += 1
                 continue
 
-        print(f'  Saved: {saved}\n  Skipped: {skipped}\n  Failed: {failed}\n  Total: {total}')
+        if args.sync:
+            for file in os.listdir(mailbox_folder_path):
+                if file.endswith(".eml"):
+                    email_uid = os.path.splitext(file)[0]
+                    email_file_path = os.path.join(mailbox_folder_path, file)
+                    if email_uid.encode() not in email_uids:
+                        os.remove(email_file_path)
+                        removed += 1
+
+        print(f'  Saved: {saved}\n  Skipped: {skipped}\n  Failed: {failed}\n  Removed: {removed}\n  Total: {total}')
 
         # Convert to MBOX format if specified
         if args.mbox:
-            print('Generating MBOX file..\n')
+            print('Creating Mbox file..\n')
             convert_to_mbox(mailbox_folder_path)
         else:
             print('')

@@ -20,5 +20,6 @@ You can also choose to:
 * Save the emails in Mbox format by supplying the `--mbox` flag
 * Only download emails newer than X days by using the `--max-age` parameter
 * Skip downloading certain mailboxes with the `--exclude` parameter
+* Remove local EML files of emails that are not on the server anymore (`--sync` parameter)
 
 The script will automatically create a folder for each mailbox and save the emails inside it.
